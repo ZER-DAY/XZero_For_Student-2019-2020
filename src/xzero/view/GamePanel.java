@@ -256,6 +256,11 @@ public class GamePanel extends JFrame {
         }
 
         @Override
+        public void labelIsPlaced(PlayerActionEvent e) {
+
+        }
+
+        @Override
         public void labelIsReceived(PlayerActionEvent e) {
             drawLabelOnInfoPanel(e.label());
         }
