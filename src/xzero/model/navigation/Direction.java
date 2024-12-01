@@ -1,28 +1,28 @@
 package xzero.model.navigation;
 
 /*
- * Direction - абстракция направления в системе координат "север-юг-восток-запад"; 
- * позволяет сравнивать направления и порождать новые направления относительно 
+ * Direction - абстракция направления в системе координат "север-юг-восток-запад";
+ * позволяет сравнивать направления и порождать новые направления относительно
  * текущего
  */
 public class Direction {
-    
-//--------- Определяем направление как угол в градусах от 0 до 360 ------------
+
+    //--------- Определяем направление как угол в градусах от 0 до 360 ------------
     private int _angle = 90;
 
     private Direction(int angle) {
         // Приводим заданный угол к допустимому диапазону 
         angle = angle%360;
         if(angle < 0)    angle += 360;
-        
+
         this._angle = angle;
     }
-    
+
 // --------------------------- Возможные направления --------------------------
-    
+
     public static Direction north()
     { return new Direction(90); }
-    
+
     public static Direction south()
     { return new Direction(270); }
 
@@ -31,7 +31,7 @@ public class Direction {
 
     public static Direction west()
     { return new Direction(180); }
-    
+
     public static Direction northEast()
     { return new Direction(45); }
 
@@ -43,13 +43,13 @@ public class Direction {
 
     public static Direction southWest()
     { return new Direction(-135); }
-    
+
 // ---------------- Смещения в декартовой системе координат  ------------------
 
     public Shift shift(){
-        
+
         int vertShift = 0, horizShift = 0;
-        
+
         if(_angle == 90 || _angle == 270)
         { horizShift = 0; }
         else if(_angle < 90 || _angle > 270)
@@ -58,7 +58,7 @@ public class Direction {
         { horizShift = -1; }
         else
         { /* TODO породить исключение*/ }
-        
+
         if(_angle == 0 || _angle == 180)
         { vertShift = 0; }
         else if(_angle > 0 && _angle < 180)
@@ -67,41 +67,41 @@ public class Direction {
         { vertShift = 1; }
         else
         { /* TODO породить исключение*/ }
-        
+
         return new Shift(horizShift, vertShift);
     }
-    
+
 // ---------------------------- Новые направления -----------------------------
-    
+
     private static int ANGLE_STEP = 45;
-    
+
     @Override
-    public Direction clone(){ 
-        return new Direction(this._angle); 
+    public Direction clone(){
+        return new Direction(this._angle);
     }
-  
-    public Direction clockwise() { 
-        return new Direction(this._angle-ANGLE_STEP); 
+
+    public Direction clockwise() {
+        return new Direction(this._angle-ANGLE_STEP);
     }
-    
-    public Direction anticlockwise() { 
-        return new Direction(this._angle+ANGLE_STEP); 
+
+    public Direction anticlockwise() {
+        return new Direction(this._angle+ANGLE_STEP);
     }
-    
-    public Direction opposite() { 
-        return new Direction(this._angle+180); 
+
+    public Direction opposite() {
+        return new Direction(this._angle+180);
     }
-    
-    public Direction rightword()  { 
-        return clockwise(); 
+
+    public Direction rightword()  {
+        return clockwise();
     }
-    
-    public Direction leftword()  { 
-        return anticlockwise(); 
+
+    public Direction leftword()  {
+        return anticlockwise();
     }
-    
+
 // --------------------------- Сравнить направления ---------------------------
-    
+
     @Override
     public boolean equals(Object other) {
 
@@ -111,7 +111,7 @@ public class Direction {
             // Возвращаем результат сравнения углов
             return  _angle == otherDirect._angle;
         }
-        
+
         return false;
     }
 
@@ -119,7 +119,7 @@ public class Direction {
     public int hashCode() {
         return this._angle;
     }
-    
+
     public boolean isOpposite(Direction other) {
         return this.opposite().equals(other);
     }

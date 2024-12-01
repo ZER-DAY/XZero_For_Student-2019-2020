@@ -133,11 +133,6 @@ public class GameModel {
     private class PlayerObserver implements PlayerActionListener{
 
         @Override
-        public void labelisPlaced(PlayerActionEvent e) {
-
-        }
-
-        @Override
         public void labelIsPlaced(PlayerActionEvent e) {
 
             //  Транслируем событие дальше для активного игрока

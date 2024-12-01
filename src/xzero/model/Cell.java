@@ -24,7 +24,7 @@ public class Cell {
     void setField(GameField f){
         _field = f;
     }
-/// +++
+
     // --------------------- Метка, принадлежащая ячейке -----------------------
     private Label _label;
 
