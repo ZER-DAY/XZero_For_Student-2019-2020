@@ -7,6 +7,7 @@ import xzero.model.Label;
  */
 public class LabelFactory {
     public Label createLabel() {
-        !!!
+        // i make to return to label;
+        return new Label();
     }
 }
