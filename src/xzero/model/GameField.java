@@ -72,8 +72,8 @@ public class GameField {
         if(obj != null)     !!!
     }
 
-    private ArrayList<Label> _labelPool = new ArrayList(); 
-    
+    private ArrayList<Label> _labelPool = new ArrayList();
+
     public List<Label> labels(){
         _labelPool.clear();
         
