@@ -152,6 +152,8 @@ public class GameField {
         return _width;
     }
 
+    // Method to get the height of the field.
+    // طريقة للحصول على ارتفاع الحقل.
     public int height() {
         return _height;
     }
