@@ -160,6 +160,8 @@ public class GameField {
         return _height;
     }
 
+    // Method to check if a position is within the field range.
+    // طريقة للتحقق مما إذا كان الموقع ضمن نطاق الحقل.
     public boolean containsRange(Point p){
         return p.getX() >= 1 && p.getX() <= _width &&
                 p.getY() >= 1 && p.getY() <= _height ;
