@@ -148,6 +148,8 @@ public class GameField {
 
     }
 
+    // Method to get the width of the field.
+    // طريقة للحصول على عرض الحقل.
     public int width() {
         return _width;
     }
