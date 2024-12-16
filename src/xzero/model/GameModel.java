@@ -12,223 +12,223 @@ import xzero.model.factory.LabelFactory;
 import xzero.model.navigation.Direction;
 
 /**
- /* Aбстракция всей игры; генерирует стартовую обстановку; поочередно передает
- * ход игрокам, задавая им метку для установки на поле; следит за игроками с
- * целью определения конца игры
+ * Abstraction of the entire game; generates the starting setup;
+ * alternates turns between players by assigning them labels to place on the field;
+ * monitors players to determine the end of the game.
+ *
+ * تجريد كامل للعبة؛ يقوم بإنشاء الوضعية الابتدائية؛
+ * يقوم بتناوب الأدوار بين اللاعبين من خلال تخصيص علامات لوضعها على اللوحة؛
+ * يراقب اللاعبين لتحديد نهاية اللعبة.
  */
-public class GameModel {
+public class
+GameModel {
 
-// -------------------------------- Поле -------------------------------------
+// -------------------------------- Field / لوحة -------------------------------------
 
+    // Game field
     private GameField field = new GameField();
 
-    public GameField field(){
+    /**
+     * Retrieves the game field.
+     *
+     * استرداد اللوحة.
+     */
+    public GameField field() {
         return field;
     }
 
-// -------------------------------- Игроки -----------------------------------
+// -------------------------------- Players / اللاعبين -----------------------------------
 
     private ArrayList<Player> _playerList = new ArrayList<>();
     private int _activePlayer;
 
-    public Player activePlayer(){
+    /**
+     * Retrieves the active player.
+     *
+     * استرداد اللاعب النشط.
+     */
+    public Player activePlayer() {
         return _playerList.get(_activePlayer);
     }
 
-    public GameModel(){
-        // Задаем размеры поля по умолчанию
+    /**
+     * Constructor to initialize the game model.
+     *
+     * منشئ لتهيئة نموذج اللعبة.
+     */
+    public GameModel() {
+        // Set default field size
         field().setSize(5, 5);
 
-        // Создаем двух игроков
+        // Create two players
         Player p;
         PlayerObserver observer = new PlayerObserver();
 
         p = new Player(field(), "X");
-        // "Следим" за игроком
+        // Add an observer to monitor the player
         p.addPlayerActionListener(observer);
         _playerList.add(p);
         _activePlayer = 0;
 
         p = new Player(field(), "O");
-        // "Следим" за игроком
+        // Add an observer to monitor the player
         p.addPlayerActionListener(observer);
         _playerList.add(p);
     }
 
-// ---------------------- Порождение обстановки на поле ---------------------
+// ---------------------- Field Initialization / تهيئة اللوحة ---------------------
 
     private CellFactory _cellFactory = new CellFactory();
 
-    private void generateField(){
-
+    /**
+     * Generates the game field and initializes cells.
+     *
+     * إنشاء اللوحة وتهيئة الخلايا.
+     */
+    private void generateField() {
         field().clear();
         field().setSize(5, 5);
-        for(int row = 1; row <= field().height(); row++)
-        {
-            for(int col = 1; col <= field().width(); col++)
-            {
+        for (int row = 1; row <= field().height(); row++) {
+            for (int col = 1; col <= field().width(); col++) {
                 field().setCell(new Point(col, row), _cellFactory.createCell());
             }
         }
     }
 
-// ----------------------------- Игровой процесс ----------------------------
+// ----------------------------- Game Process / سير اللعبة ----------------------------
 
-    public void start(){
-
-        // Генерируем поле
+    /**
+     * Starts the game by generating the field and alternating the players' turns.
+     *
+     * بدء اللعبة من خلال إنشاء اللوحة وتناوب أدوار اللاعبين.
+     */
+    public void start() {
         generateField();
-
-        // Передаем ход первому игроку
-        _activePlayer = _playerList.size()-1;
+        _activePlayer = _playerList.size() - 1;
         exchangePlayer();
     }
 
     private LabelFactory _labelFactory = new LabelFactory();
 
-    private void exchangePlayer(){
-
-        // Сменить игрока
+    /**
+     * Alternates turns between players and assigns a new label.
+     *
+     * تبديل الأدوار بين اللاعبين وتعيين علامة جديدة.
+     */
+    private void exchangePlayer() {
         _activePlayer++;
-        if(_activePlayer >= _playerList.size())     _activePlayer = 0;
+        if (_activePlayer >= _playerList.size()) {
+            _activePlayer = 0;
+        }
 
-        // Выбрать для него метку
         Label newLabel = _labelFactory.createLabel();
         activePlayer().setActiveLabel(newLabel);
 
-        // Генерируем событие
         firePlayerExchanged(activePlayer());
     }
 
-
     private static int WINNER_LINE_LENGTH = 5;
 
-    private Player determineWinner(){
-
-        for(int row = 1; row <= field().height(); row++)
-        {
-            for(int col = 1; col <= field().width(); col++)
-            {
+    /**
+     * Determines the winner of the game.
+     *
+     * تحديد الفائز في اللعبة.
+     */
+    private Player determineWinner() {
+        for (int row = 1; row <= field().height(); row++) {
+            for (int col = 1; col <= field().width(); col++) {
                 Point pos = new Point(col, row);
                 Direction direct = Direction.north();
-                for(int  i = 1; i <= 8; i++)
-                {
+                for (int i = 1; i <= 8; i++) {
                     direct = direct.rightword();
 
                     List<Label> line = field().labelLine(pos, direct);
 
-                    if(line.size() >= WINNER_LINE_LENGTH)
-                    {
+                    if (line.size() >= WINNER_LINE_LENGTH) {
                         return line.get(0).player();
                     }
                 }
             }
         }
-
         return null;
     }
 
-    // ------------------------- Реагируем на действия игрока ------------------
+// ------------------------- Player Actions / أفعال اللاعب ------------------
 
-    private class PlayerObserver implements PlayerActionListener{
+    private class PlayerObserver implements PlayerActionListener {
 
         @Override
         public void labelIsPlaced(PlayerActionEvent e) {
-
-            //  Транслируем событие дальше для активного игрока
-            if(e.player() == activePlayer()){
+            if (e.player() == activePlayer()) {
                 fireLabelIsPlaced(e);
             }
 
-            // Определяем победителя
             Player winner = determineWinner();
 
-            // Меняем игрока, если игра продолжается
-            if(winner == null)
-            {
+            if (winner == null) {
                 exchangePlayer();
-            }
-            else
-            {
-                // Генерируем событие
+            } else {
                 fireGameFinished(winner);
             }
         }
 
         @Override
         public void labelIsReceived(PlayerActionEvent e) {
-            //  Транслируем событие дальше для активного игрока
-            if(e.player() == activePlayer()){
+            if (e.player() == activePlayer()) {
                 fireLabelIsReceived(e);
             }
         }
     }
 
-// ------------------------ Порождает события игры ----------------------------
+// ------------------------ Game Events / أحداث اللعبة ------------------------
 
-    // Список слушателей
-    private ArrayList _listenerList = new ArrayList();
+    private ArrayList<GameListener> _listenerList = new ArrayList<>();
 
-    // Присоединяет слушателя
     public void addGameListener(GameListener l) {
         _listenerList.add(l);
     }
 
-    // Отсоединяет слушателя
     public void removeGameListener(GameListener l) {
         _listenerList.remove(l);
     }
 
-    // Оповещает слушателей о событии
     protected void fireGameFinished(Player winner) {
-
         GameEvent event = new GameEvent(this);
         event.setPlayer(winner);
-        for (Object listener : _listenerList)
-        {
-            ((GameListener)listener).gameFinished(event);
+        for (GameListener listener : _listenerList) {
+            listener.gameFinished(event);
         }
     }
 
     protected void firePlayerExchanged(Player p) {
-
         GameEvent event = new GameEvent(this);
         event.setPlayer(p);
-        for (Object listener : _listenerList)
-        {
-            ((GameListener)listener).playerExchanged(event);
+        for (GameListener listener : _listenerList) {
+            listener.playerExchanged(event);
         }
     }
 
-// --------------------- Порождает события, связанные с игроками -------------
+// --------------------- Player Events / أحداث اللاعبين ----------------------
 
-    // Список слушателей
-    private ArrayList _playerListenerList = new ArrayList();
+    private ArrayList<PlayerActionListener> _playerListenerList = new ArrayList<>();
 
-    // Присоединяет слушателя
     public void addPlayerActionListener(PlayerActionListener l) {
         _playerListenerList.add(l);
     }
 
-    // Отсоединяет слушателя
     public void removePlayerActionListener(PlayerActionListener l) {
         _playerListenerList.remove(l);
     }
 
-    // Оповещает слушателей о событии
     protected void fireLabelIsPlaced(PlayerActionEvent e) {
-
-        for (Object listener : _playerListenerList)
-        {
-            ((PlayerActionListener)listener).labelIsPlaced(e);
+        for (PlayerActionListener listener : _playerListenerList) {
+            listener.labelIsPlaced(e);
         }
     }
 
     protected void fireLabelIsReceived(PlayerActionEvent e) {
-
-        for (Object listener : _playerListenerList)
-        {
-            ((PlayerActionListener)listener).labelIsReceived(e);
+        for (PlayerActionListener listener : _playerListenerList) {
+            listener.labelIsReceived(e);
         }
     }
 }
